@@ -29,10 +29,8 @@ for test in ${TESTS}; do
     TEST_FILE="$TEST_FOLDER/$BS-$COUNT.iotest"
     BS=$(echo $test | cut -d ":" -f 1)
     COUNT=$(echo $test | cut -d ":" -f 2)
-    WRITE=$(dd if=/dev/zero of=$TEST_FILE bs=$BS count=$COUNT 2>&1 | tail -n1 | awk '{print $(NF-1), $NF, $(NF-3)}')
-    WRITE=($WRITE)
-    READ=$(dd if=$TEST_FILE of=/dev/null bs=$BS count=$COUNT 2>&1 | tail -n1 | awk '{print $(NF-1), $NF, $(NF-3)}')
-    READ=($READ)
+    WRITE=($(dd if=/dev/zero of=$TEST_FILE bs=$BS count=$COUNT 2>&1 | tail -n1 | awk '{print $(NF-1), $NF, $(NF-3)}'))
+    READ=($(dd if=$TEST_FILE of=/dev/null bs=$BS count=$COUNT 2>&1 | tail -n1 | awk '{print $(NF-1), $NF, $(NF-3)}'))
     printf '%-20s%12s%10.3f%12s%10.3f\n' "bs=$BS count=$COUNT" "${WRITE[0]} ${WRITE[1]}" "${WRITE[2]}" "${READ[0]} ${READ[1]}" "${READ[2]}"
     rm $TEST_FILE
 done
