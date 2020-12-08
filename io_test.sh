@@ -15,10 +15,11 @@ fi
 umask 0000
 
 echo ""
+date
 echo "Zero test speed: $(dd if=/dev/zero of=/dev/null bs=1M count=1024 2>&1 | tail -n1 | awk '{print $(NF-1), $NF}')"
 echo ""
 
-printf '%-20s%12s%10s%12s%10s\n' "TEST" "WRITE" "SEC" "READ" "SEC"
+printf '%-20s%12s%10s%12s%10s%15s\n' "TEST" "WRITE" "SEC" "READ" "SEC" "SIZE"
 
 for test in ${TESTS}; do 
     if [ $(id -u) = 0 ]; then
@@ -29,9 +30,9 @@ for test in ${TESTS}; do
     TEST_FILE="$TEST_FOLDER/$BS-$COUNT.iotest"
     BS=$(echo $test | cut -d ":" -f 1)
     COUNT=$(echo $test | cut -d ":" -f 2)
-    WRITE=($(dd if=/dev/zero of=$TEST_FILE bs=$BS count=$COUNT 2>&1 | tail -n1 | awk '{print $(NF-1), $NF, $(NF-3)}'))
+    WRITE=($(dd if=/dev/zero of=$TEST_FILE bs=$BS count=$COUNT 2>&1 | tail -n1 | awk '{print $(NF-1), $NF, $(NF-3), $(NF-6) $(NF-5)}'))
     READ=($(dd if=$TEST_FILE of=/dev/null bs=$BS count=$COUNT 2>&1 | tail -n1 | awk '{print $(NF-1), $NF, $(NF-3)}'))
-    printf '%-20s%12s%10.3f%12s%10.3f\n' "bs=$BS count=$COUNT" "${WRITE[0]} ${WRITE[1]}" "${WRITE[2]}" "${READ[0]} ${READ[1]}" "${READ[2]}"
+    printf '%-20s%12s%10.3f%12s%10.3f%15s\n' "bs=$BS count=$COUNT" "${WRITE[0]} ${WRITE[1]}" "${WRITE[2]}" "${READ[0]} ${READ[1]}" "${READ[2]}" "${WRITE[3]}"
     rm $TEST_FILE
 done
 
